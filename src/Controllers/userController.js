@@ -109,7 +109,6 @@ const createUser = async (req, res) => {
         let result = await userModel.create(obj);
         return res.status(201).send({ status: true, message: 'User created successfully', data: result });
     } catch (err) {
-        console.log(err.message);
        return res.status(500).send({ status: false, message: err.message });
     }
 };
