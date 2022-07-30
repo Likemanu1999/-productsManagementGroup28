@@ -17,6 +17,8 @@ router.post('/products', productController.createProduct)
 router.get("/products/:productId",productController.productByid)
 router.get("/products", productController.getProductByFilter)
 router.delete('/products/:productId', productController.deleteByid)
+router.put("/products/:productId",productController.updateProductById)
+
 
 
 // if api is invalid OR wrong URL
