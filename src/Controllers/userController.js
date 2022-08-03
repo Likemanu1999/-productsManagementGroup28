@@ -18,17 +18,13 @@ const saltRounds = 10;
 
 const createUser = async (req, res) => {
     try {
-        let data = JSON.parse(JSON.stringify(req.body));;
+        let data = req.body
 
         let profileImage = req.files;
         let { fname, lname, email, phone, password, address } = data;
 
         if (isValidRequestBody(data))
             return res.status(400).send({ status: false, message: "Form data cannot be empty" })
-
-        let checkdata = anyObjectKeysEmpty(data)
-        if (checkdata) return res.status(400).send({ status: false, message: `${checkdata} can't be empty` });
-
         if (isEmpty(fname))
             return res.status(400).send({ status: false, message: "fname required" });
         if (isEmpty(lname))

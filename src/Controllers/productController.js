@@ -5,16 +5,13 @@ const { isValidRequestBody, isEmpty, isValidObjectId, checkImage, stringCheck, n
 
 const createProduct = async (req, res) => {
     try {
-        let data = JSON.parse(JSON.stringify(req.body));
+        let data = req.body
         let productImage = req.files;
         
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = data
 
         if (isValidRequestBody(data))
             return res.status(400).send({ status: false, message: "Form data cannot be empty" });
-
-        let checkdata = anyObjectKeysEmpty(data)
-        if (checkdata) return res.status(400).send({ status: false, message: `${checkdata} can't be empty` });
 
         //Product Image Validation
         if (productImage.length == 0)
