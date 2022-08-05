@@ -25,6 +25,10 @@ router.post('/users/:userId/cart', mid.mid1, cartController.createCart)
 router.get('/users/:userId/cart', mid.mid1, cartController.getCart)
 router.delete('/users/:userId/cart', mid.mid1, cartController.deleteCart)
 
+//createOrder
+router.post('/users/:userId/orders', mid.mid1, orderController.createOrder)
+router.put('/users/:userId/orders', mid.mid1, orderController.updateOrder)
+
 
 
 
