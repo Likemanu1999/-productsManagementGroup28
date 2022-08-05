@@ -4,65 +4,97 @@ const userModel = require("../Models/userModel");
 const { isValidRequestBody, isEmpty, isValidObjectId, checkImage, stringCheck, numCheck, anyObjectKeysEmpty, } = require("../Utilites/validation");
 
 const createCart = async function (req, res) {
-    try {
-        let data = req.body;
-
-        let validuserId = req.params.userId
-        if (!isValidObjectId(validuserId)) {
-            return res.status(400).send({ status: false, message: "Invalid userId in params" });
+        try {
+          let userId = req.params.userId;
+          
+          if (!(isValidObjectId(userId))) {
+            return res.status(400).send({ status: false, message: "Please provide valid User Id" });
         }
-        const user = await userModel.findOne({ _id: validuserId })
-        if (!user) {
-            return res.status(404).send({ status: false, message: `user not found` })
+          let data = req.body
+          if(!(isValidRequestBody(data))){
+           return res .status(404).send({status:false,msg:"plz provide the data"})
+          }
+          let {quantity, productId } = data;
+        
+          
+          if(!(isValid(productId))){
+            return res.status(400).send({ status: false, message: "Please provide the product Id" });
+      
+          }
+          if(!(isValidObjectId(productId))){
+            return res.status(400).send({ status: false, message: "Please provide valid Product Id" });
+      
+          }
+          let findUser = await userModel.findById({ _id: userId });
+      
+      
+          if (!findUser) {
+              return res.status(400).send({ status: false, message: `User doesn't exist by ${userId}` });
+          }
+      
+          let findProduct = await productModel.findOne({ _id: productId, isDeleted: false });
+       
+          if (!findProduct) {
+              return res.status(400).send({ status: false, message: `Product doesn't exist by ${productId}` });
+          }
+        
+          let findUserCart = await cartModel.findOne({ userId: userId });
+          console.log(findUserCart,"this for cart")
+          if (!quantity) {
+            quantity = 1;
+          }
+      
+          if (!findUserCart) {
+            var cartData = {
+                userId: userId,
+                items: [
+                    {
+                        productId: productId,
+                        quantity:quantity,
+                    },
+                ],
+                totalPrice: findProduct.price * quantity,
+                totalItems: 1,
+            };
+            let createCart = await cartModel.create(cartData);
+            return res.status(201).send({ status: true, message: `Cart created successfully`, data: createCart });
         }
-        let tokenUserId = req.decodeToken.userId;
-        if (user._id.toString() !== tokenUserId) {
-            return res.status(403).send({ status: false, message: "Unauthorized access" });
+        if (findUserCart) {
+      
+          let price = findUserCart.totalPrice + (quantity) * findProduct.price;
+          let arr = findUserCart.items;
+            for (i in arr) {
+              if (arr[i].productId.toString() === productId) {
+                  arr[i].quantity +=quantity
+                  let updatedCart = {
+                      items: arr,
+                      totalPrice: price,
+                      totalItems: arr.length,
+                  };
+      
+                  let responseData = await cartModel.findOneAndUpdate(
+                      { _id: findUserCart._id },
+                      updatedCart,
+                      { new: true }
+                  );
+                  console.log(responseData);
+                  return res.status(200).send({ status: true, message: `Product added successfully`, data: responseData });
+              }
+          }
+          arr.push({ productId: productId, quantity: quantity });
+          let updatedCart = {
+            items: arr,
+            totalPrice: price,
+            totalItems: arr.length,
+        };
+      
+        let responseData = await cartModel.findOneAndUpdate({ _id: findUserCart._id }, updatedCart, { new: true });
+        return res.status(200).send({ status: true, message: `Product added successfully`, data: responseData });
+      }
+      } catch (error) {
+          return res.status(500).send({msg:error.message})
         }
-        if (isValidRequestBody(data)) {
-            return res.status(400).send({ status: false, message: "Invalid request body" });
-        }
-        data.userId = validuserId
-        if (isEmpty(data.productId)) {
-            return res.status(400).send({ status: false, message: " productId is required" });
-        }
-        if (!isValidObjectId(data.productId)) {
-            return res.status(400).send({ status: false, message: "Product ID is not valid" })
-        }
-        const product = await productModel.findOne({ _id: data.productId, isDeleted: false })
-        if (!product) {
-            return res.status(404).send({ status: false, message: `product not found` })
-        }
-        data.items = req.body
-        data.totalPrice = product.price * req.body.quantity
-        data.totalItems = Object.keys(data.items).length
-
-        // if (isEmpty(items.quantity)) {
-        //     return res.status(400).send({ status: false, message: "In the items quantity is required" });
-        // }
-        // let quantityvalidate = /^[0-9]$/.test(items.quantity)
-        // if (!quantityvalidate) {
-        //     return res.status(400).send({ status: false, message: "Quantity should only be number" })
-        // }
-        // if (isEmpty(totalPrice)) {
-        //     return res.status(400).send({ status: false, message: "TotalPrice is required" });
-        // }
-        // if (!(/^[0-9]{1,4}(?:\.[0-9]{1,4})?$/.test(items.totalPrice))) {
-        //     return res.status(400).send({ status: false, message: "TotalPrice should only be number" })
-        // }
-        // if (isEmpty(totalItems)) {
-        //     return res.status(400).send({ status: false, message: "Totalitems is required" });
-        // }
-        // if (!(/^[0-9]$/.test(items.totalItems))) {
-        //     return res.status(400).send({ status: false, message: "Totalitems should only be number" })
-        // }
-        const createdcart = await cartModel.create(data)
-        res.status(201).send({ status: true, message: "Cart created successfully", data: createdcart })
-
-    } catch (err) {
-        return res.status(500).send({ status: false, message: err.message });
-    }
-}
+      }
 
 const getCart = async function (req, res) {
     try {
