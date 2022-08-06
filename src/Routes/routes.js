@@ -5,6 +5,7 @@ const mid = require('../Middlewares/auth')
 const userController = require('../Controllers/userController')
 const productController = require('../Controllers/productController')
 const cartController = require('../Controllers/cartController')
+const orderController = require('../Controllers/orderController')
 
 
 //user routes
@@ -28,8 +29,6 @@ router.delete('/users/:userId/cart', mid.mid1, cartController.deleteCart)
 //createOrder
 router.post('/users/:userId/orders', mid.mid1, orderController.createOrder)
 router.put('/users/:userId/orders', mid.mid1, orderController.updateOrder)
-
-
 
 
 // if api is invalid OR wrong URL
