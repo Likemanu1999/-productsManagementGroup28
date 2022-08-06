@@ -107,12 +107,26 @@ const updateOrder = async function  (req, res) {
         const validOrder = await orderModel.findOne({ _id: orderId })
         if (!validOrder) return res.status(404).send({ status: false, message: "Order does not exists" })
 
+        if (['pending', 'completed', 'cancelled']=== -1)
+            return res.status(400).send({ status: false, message: `Order status should be 'pending', 'completed', 'cancelled' ` })
 
+        if (validOrder.status == 'cancelled')
+            return res.status(400).send({ status: false, message: "This order is already cancelled" })
 
+        if (validOrder.status == 'completed' && status == 'pending')
+            return res.status(400).send({ status: false, message: "This order is already completed" })
 
-} catch (err) {
-    return res.status(500).send({ status: false, err: err.message });
-}
+        if (status == 'cancelled') {
+            if (validOrder.cancellable == false)
+                return res.status(400).send({ status: false, message: "This order is not cancellable." })
+        }
+
+        validOrder.status = status
+        await validOrder.save()
+        return res.status(200).send({ status: true, message: `Status upadated to ${status}`, data: validOrder })
+    } catch (err) {
+        return res.status(500).send({ status: false, err: err.message });
+    }
 }
 
 module.exports = { createOrder, updateOrder }
