@@ -23,6 +23,7 @@ router.put("/products/:productId",productController.updateProductById)
 
 //createcart
 router.post('/users/:userId/cart', mid.mid1, cartController.createCart)
+router.put('/users/:userId/cart', mid.mid1, cartController.updateCart)
 router.get('/users/:userId/cart', mid.mid1, cartController.getCart)
 router.delete('/users/:userId/cart', mid.mid1, cartController.deleteCart)
 

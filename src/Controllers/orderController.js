@@ -2,7 +2,7 @@ const cartModel = require('../Models/cartModel');
 const productModel = require('../Models/productModel')
 const userModel = require("../Models/userModel");
 const orderModel = require("../Models/orderModel")
-const { isValidRequestBody, isEmpty, isValidObjectId, checkImage, stringCheck, numCheck, anyObjectKeysEmpty, } = require("../Utilites/validation");
+const { isValidRequestBody, isEmpty, isValidObjectId, } = require("../Utilites/validation");
 
 const createOrder = async function (req,res){
     try {

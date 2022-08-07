@@ -8,7 +8,6 @@ const {
     isValidPassword,
     isValidObjectId,
     checkPincode,
-    anyObjectKeysEmpty,
     checkImage
 } = require("../Utilites/validation");
 
@@ -16,7 +15,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const createUser = async (req, res) => {
+const createUser = async function (req, res)  {
     try {
         let data = req.body
 
@@ -161,7 +160,7 @@ const getUserProfile = async function (req, res) {
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
     }
-}
+};
 
     const updateUser = async function (req, res) {
         try {
@@ -170,7 +169,8 @@ const getUserProfile = async function (req, res) {
             let userId = req.params.userId;
             if (!isValidObjectId(userId)) 
                 return res.status(400).send({ status: false, message: "Invalid userId in params" });
-                let { fname, lname, email, phone, password, address } = data;
+
+             let { fname, lname, email, phone, password, address } = data;
     
             
             let userProfile = await userModel.findOne({ _id: userId });
@@ -263,9 +263,7 @@ const getUserProfile = async function (req, res) {
                     }
                 }
             }
-            // if(profileImage){
-            // console.log("a")
-            // }
+          
             if (profileImage.length > 0) {
                 if (profileImage.length > 1)
                     return res.status(400).send({ status: false, message: "only one image at a time" });
