@@ -60,7 +60,7 @@ const createProduct = async function (req, res)  {
         if (isEmpty(availableSizes))  
          return res.status(400).send({ status: false, message: "availableSizes required" });
     if (availableSizes) {
-        let validSizes = ["S", "XS", "M", "X", "L", "XXL", "XL"]
+        let validSizes = ["S", "XS", "M", "X", "L", "XXL", "XL"] ///s , m ,=>["S","XS","L"]
         var InputSizes = availableSizes.toUpperCase().split(",").map((s) =>{ return s.trim()})
         for (let i = 0; i < InputSizes.length; i++) {
             if (!validSizes.includes(InputSizes[i])) {
